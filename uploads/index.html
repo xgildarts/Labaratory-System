@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Records System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #34495e;
+            color: white;
+            padding: 20px 0;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        .logo h2 {
+            font-size: 20px;
+            margin-left: 10px;
+        }
+        .menu {
+            list-style: none;
+        }
+        .menu li {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        .menu li:hover, .menu li.active {
+            background-color: #2c3e50;
+        }
+        .menu li i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-left: 250px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .search-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 5px;
+            padding: 8px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 5px;
+            width: 200px;
+        }
+        .add-btn {
+            background-color: #4B5563;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .add-btn:hover {
+            background-color: #374151;
+        }
+        .card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        th {
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+        }
+        th:hover {
+            background-color: #f9f9f9;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .btn {
+            padding: 6px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            color: #333333;
+        }
+        .btn-edit {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+        }
+        .btn-edit:hover {
+            background-color: #c8e6c9;
+        }
+        .btn-delete {
+            background-color: #fce4ec;
+            border: 1px solid #f8bbd0;
+        }
+        .btn-delete:hover {
+            background-color: #f8bbd0;
+        }
+        .program-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        @media (max-width: 768px) {
+            .program-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .program-btn {
+            background-color: #4B5563;
+            color: white;
+            border: none;
+            padding: 12px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .program-btn:hover {
+            background-color: #374151;
+            transform: translateY(-2px);
+        }
+        .program-btn.active {
+            background-color: #2c3e50;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 900px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.4s;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .form-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        .form-control:focus {
+            border-color: #4B5563;
+            outline: none;
+        }
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+            grid-column: 1 / -1;
+        }
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #777;
+            transition: color 0.3s;
+        }
+        .close:hover {
+            color: #333;
+        }
+        .hidden-content {
+            display: none;
+        }
+        #dashboard-content {
+            display: none;
+        }
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        @media (max-width: 1024px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
+            .logo h2 {
+                display: none;
+            }
+            .menu li span {
+                display: none;
+            }
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card i {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #4B5563;
+        }
+        .stat-card h3 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .stat-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .pagination button:hover, .pagination button.active {
+            background-color: #4B5563;
+            color: white;
+            border-color: #4B5563;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1010;
+            animation: slideInRight 0.4s;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(300px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+        .confirm-modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .confirm-modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-cancel:hover {
+            background-color: #7f8c8d;
+        }
+        .calendar-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .calendar th, .calendar td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .calendar th {
+            background-color: #4B5563;
+            color: white;
+        }
+        .calendar td.empty {
+            background-color: #f5f5f5;
+        }
+        .program-stats {
+            display: none;
+            margin-top: 20px;
+        }
+        .program-stats table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .program-stats th, .program-stats td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .program-stats th {
+            background-color: #4B5563;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-school"></i>
+                <h2>Registrar System</h2>
+            </div>
+            <ul class="menu">
+                <li onclick="showContent('dashboard')" id="dashboard-nav"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></li>
+                <li onclick="showContent('registrar')" id="registrar-nav" class="active"><i class="fas fa-user-graduate"></i> <span>Registrar Records</span></li>
+                <li onclick="openAddStudentModal()" id="incomplete-nav"><i class="fas fa-plus-circle"></i> <span>Add New Student</span></li>
+                <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <!-- Dashboard Content -->
+            <div id="dashboard-content">
+                <div class="header">
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="dashboard-stats">
+                    <div class="stat-card" onclick="showProgramStats()">
+                        <i class="fas fa-user-graduate"></i>
+                        <h3 id="total-students">0</h3>
+                        <p>Total Students</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h3>12</h3>
+                        <p>Degree Programs</p>
+                    </div>
+                    <div class="stat-card" onclick="showCalendar()">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>2025</h3>
+                        <p>Current Year</p>
+                    </div>
+                </div>
+                <div id="program-stats" class="program-stats">
+                    <h2>Students per Degree Program</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Degree Program</th>
+                                <th>Student Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="program-stats-body"></tbody>
+                    </table>
+                </div>
+                <div id="calendar-container" class="calendar-container">
+                    <h2>2025 Calendar</h2>
+                    <div id="calendar"></div>
+                </div>
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <h2>Recent Activities</h2>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Student</th>
+                                    <th>Program</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-activities">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Registrar Records Content -->
+            <div id="registrar-content">
+                <div class="header">
+                    <h1>Registrar Records</h1>
+                    <div class="search-container">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="student-search" placeholder="Search student name" oninput="searchStudents(this.value)">
+                        </div>
+                        <div class="search-box">
+                            <i class="fas fa-calendar"></i>
+                            <input type="text" id="year-search" placeholder="Search by year" oninput="searchByYear(this.value)">
+                        </div>
+                        <button class="add-btn" onclick="openAddStudentModal()">
+                            <i class="fas fa-plus"></i> Add New Student
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Filters</h2>
+                    </div>
+                    <div class="program-buttons">
+                        <button class="program-btn active" onclick="filterByProgram('all')">ALL</button>
+                        <button class="program-btn" onclick="filterByProgram('incomplete')">Incomplete Info</button>
+                        <button class="program-btn" onclick="filterByProgram('BSIT')">BSIT</button>
+                        <button class="program-btn" onclick="filterByProgram('BEED')">BEED</button>
+                        <button class="program-btn" onclick="filterByProgram('BSHM')">BSHM</button>
+                        <button class="program-btn" onclick="filterByProgram('BPED')">BPED</button>
+                        <button class="program-btn" onclick="filterByProgram('BSBA-MM')">BSBA-MM</button>
+                        <button class="program-btn" onclick="filterByProgram('BS-CRIM')">BS-CRIM</button>
+                        <button class="program-btn" onclick="filterByProgram('BSED-FILIPINO')">BSED-FILIPINO</button>
+                        <button class="program-btn" onclick="filterByProgram('BSED-ENGLISH')">BSED-ENGLISH</button>
+                        <button class="program-btn" onclick="filterByProgram('JHS')">JHS</button>
+                        <button class="program-btn" onclick="filterByProgram('STEM')">STEM</button>
+                        <button class="program-btn" onclick="filterByProgram('ABM')">ABM</button>
+                        <button class="program-btn" onclick="filterByProgram('ELEMENTARY')">ELEMENTARY</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Student Records</h2>
+                    </div>
+                    <div class="table-container">
+                        <table id="student-table">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable(0)">Special Order Number <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(1)">Last Name<i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(2)">First Name <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(3)">Middle Name <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(4)">Gender <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(5)">Birthdate <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(6)">Year Graduated<i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(7)">Degree Program<i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(8)">Address<i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(9)">Contact<i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(10)">Action<i class="fas fa-sort"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-table-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <button onclick="changePage(1)" class="active">1</button>
+                        <button onclick="changePage(2)">2</button>
+                        <button onclick="changePage(3)">3</button>
+                        <button onclick="changePage('next')"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+            <!-- Add/Edit Student Modal -->
+            <div id="student-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">×</span>
+                    <h2 id="modal-title">Add New Student</h2>
+                    <div id="student-form">
+                        <div class="form-container">
+                            <div class="form-group">
+                                <label for="special-order">Special Order Number</label>
+                                <input type="text" id="special-order" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="last-name">Last Name</label>
+                                <input type="text" id="last-name" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="first-name">First Name</label>
+                                <input type="text" id="first-name" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="middle-name">Middle Name</label>
+                                <input type="text" id="middle-name" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <select id="gender" class="form-control">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="birthdate">Birthdate (mm/dd/yyyy)</label>
+                                <input type="text" id="birthdate" class="form-control" placeholder="mm/dd/yyyy">
+                            </div>
+                            <div class="form-group">
+                                <label for="year-graduated">Year Graduated</label>
+                                <input type="number" id="year-graduated" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="degree-program">Degree Program</label>
+                                <select id="degree-program" class="form-control">
+                                    <option value="">Select Program</option>
+                                    <option value="BSIT">BSIT</option>
+                                    <option value="BEED">BEED</option>
+                                    <option value="BSHM">BSHM</option>
+                                    <option value="BPED">BPED</option>
+                                    <option value="BSBA-MM">BSBA-MM</option>
+                                    <option value="BS-CRIM">BS-CRIM</option>
+                                    <option value="BSED-FILIPINO">BSED-FILIPINO</option>
+                                    <option value="BSED-ENGLISH">BSED-ENGLISH</option>
+                                    <option value="JHS">JHS</option>
+                                    <option value="STEM">STEM</option>
+                                    <option value="ABM">ABM</option>
+                                    <option value="ELEMENTARY">ELEMENTARY</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Address</label>
+                                <input type="text" id="address" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact">Contact Number</label>
+                                <input type="tel" id="contact" class="form-control">
+                            </div>
+                            <div class="form-buttons">
+                                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                                <button class="btn btn-edit" onclick="submitStudent()">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Delete Confirmation Modal -->
+            <div id="confirm-delete-modal" class="confirm-modal">
+                <div class="confirm-modal-content">
+                    <h2>Confirm Delete</h2>
+                    <p>Are you sure you want to delete this student record?</p>
+                    <div class="confirm-modal-buttons">
+                        <button class="btn-cancel" onclick="closeConfirmModal()">Cancel</button>
+                        <button class="btn btn-delete" onclick="deleteStudent()">Yes</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Notification -->
+            <div id="notification" class="notification"></div>
+        </div>
+    </div>
+    <script>
+        let students = [];
+        let currentEditId = null;
+        let currentDeleteId = null;
+        let currentPage = 1;
+        const rowsPerPage = 5;
+        let currentFilter = 'all';
+        let recentActivities = [];
+
+        // Fetch students from backend
+        async function fetchStudents() {
+            try {
+                const response = await fetch('api.php');
+                students = await response.json();
+                updateTable();
+                updateTotalStudents();
+                updateRecentActivities();
+            } catch (error) {
+                console.error('Error fetching students:', error);
+                showNotification('Failed to load students');
+            }
+        }
+
+        function showContent(section) {
+            document.querySelectorAll('.main-content > div').forEach(div => {
+                div.style.display = 'none';
+            });
+            document.getElementById(`${section}-content`).style.display = 'block';
+            document.querySelectorAll('.menu li').forEach(li => {
+                li.classList.remove('active');
+            });
+            document.getElementById(`${section}-nav`).classList.add('active');
+        }
+
+        function filterByProgram(filter) {
+            currentFilter = filter;
+            const buttons = document.querySelectorAll('.program-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            const activeButton = Array.from(buttons).find(btn => btn.onclick.toString().includes(`'${filter}'`));
+            if (activeButton) activeButton.classList.add('active');
+            updateTable();
+        }
+
+        function hasIncompleteInfo(student) {
+            return Object.values(student).some(value => value === '' || value === null || value === undefined);
+        }
+
+        function searchStudents(query) {
+            query = query.toLowerCase();
+            const filtered = students.filter(student => 
+                student.last_name.toLowerCase().startsWith(query) ||
+                student.first_name.toLowerCase().startsWith(query) ||
+                (student.middle_name && student.middle_name.toLowerCase().startsWith(query))
+            );
+            updateTable(filtered);
+        }
+
+        function searchByYear(query) {
+            query = query.toLowerCase();
+            const filtered = students.filter(student => 
+                String(student.year_graduated).startsWith(query)
+            );
+            updateTable(filtered);
+        }
+
+        function openAddStudentModal() {
+            document.getElementById('student-modal').style.display = 'block';
+            document.getElementById('modal-title').textContent = 'Add New Student';
+            document.getElementById('student-form').reset();
+            currentEditId = null;
+        }
+
+        function editStudent(button) {
+            const row = button.closest('tr');
+            const index = Array.from(document.querySelectorAll('#student-table-body tr')).indexOf(row);
+            const student = filteredStudents()[index];
+            currentEditId = student.id;
+            document.getElementById('special-order').value = student.special_order || '';
+            document.getElementById('last-name').value = student.last_name || '';
+            document.getElementById('first-name').value = student.first_name || '';
+            document.getElementById('middle-name').value = student.middle_name || '';
+            document.getElementById('gender').value = student.gender || '';
+            document.getElementById('birthdate').value = student.birthdate || '';
+            document.getElementById('year-graduated').value = student.year_graduated || '';
+            document.getElementById('degree-program').value = student.degree_program || '';
+            document.getElementById('address').value = student.address || '';
+            document.getElementById('contact').value = student.contact || '';
+            document.getElementById('modal-title').textContent = 'Edit Student';
+            document.getElementById('student-modal').style.display = 'block';
+        }
+
+        async function submitStudent() {
+            const student = {
+                id: currentEditId,
+                specialOrder: document.getElementById('special-order').value || '',
+                lastName: document.getElementById('last-name').value || '',
+                firstName: document.getElementById('first-name').value || '',
+                middleName: document.getElementById('middle-name').value || '',
+                gender: document.getElementById('gender').value || '',
+                birthdate: document.getElementById('birthdate').value || '',
+                yearGraduated: document.getElementById('year-graduated').value || '',
+                degreeProgram: document.getElementById('degree-program').value || '',
+                address: document.getElementById('address').value || '',
+                contact: document.getElementById('contact').value || ''
+            };
+
+            try {
+                if (currentEditId) {
+                    await fetch('api.php', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(student)
+                    });
+                    showNotification('Student updated successfully!');
+                    addRecentActivity('Updated information', `${student.lastName}, ${student.firstName}`, student.degreeProgram);
+                } else {
+                    await fetch('api.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(student)
+                    });
+                    showNotification('Student added successfully!');
+                    addRecentActivity('Added new student', `${student.lastName}, ${student.firstName}`, student.degreeProgram);
+                }
+                await fetchStudents();
+                closeModal();
+            } catch (error) {
+                console.error('Error submitting student:', error);
+                showNotification('Failed to submit student');
+            }
+        }
+
+        function confirmDelete(button) {
+            const row = button.closest('tr');
+            const index = Array.from(document.querySelectorAll('#student-table-body tr')).indexOf(row);
+            currentDeleteId = filteredStudents()[index].id;
+            document.getElementById('confirm-delete-modal').style.display = 'block';
+        }
+
+        async function deleteStudent() {
+            try {
+                const student = students.find(s => s.id === currentDeleteId);
+                await fetch('api.php', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: currentDeleteId })
+                });
+                showNotification('Student deleted successfully!');
+                addRecentActivity('Deleted record', `${student.last_name}, ${student.first_name}`, student.degree_program);
+                await fetchStudents();
+                closeConfirmModal();
+            } catch (error) {
+                console.error('Error deleting student:', error);
+                showNotification('Failed to delete student');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('student-modal').style.display = 'none';
+            document.getElementById('student-form').reset();
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-delete-modal').style.display = 'none';
+            currentDeleteId = null;
+        }
+
+        function filteredStudents() {
+            let filtered = students;
+            if (currentFilter === 'incomplete') {
+                filtered = students.filter(student => hasIncompleteInfo(student));
+            } else if (currentFilter !== 'all') {
+                filtered = students.filter(student => student.degree_program === currentFilter);
+            }
+            return filtered;
+        }
+
+        function updateTable(filtered = filteredStudents()) {
+            const tbody = document.getElementById('student-table-body');
+            tbody.innerHTML = '';
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginated = filtered.slice(start, end);
+
+            paginated.forEach(student => {
+                const row = document.createElement('tr');
+                row.dataset.program = student.degree_program;
+                row.innerHTML = `
+                    <td>${student.special_order || '-'}</td>
+                    <td>${student.last_name || '-'}</td>
+                    <td>${student.first_name || '-'}</td>
+                    <td>${student.middle_name || '-'}</td>
+                    <td>${student.gender || '-'}</td>
+                    <td>${student.birthdate || '-'}</td>
+                    <td>${student.year_graduated || '-'}</td>
+                    <td>${student.degree_program || '-'}</td>
+                    <td>${student.address || '-'}</td>
+                    <td>${student.contact || '-'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-edit" onclick="editStudent(this)">Edit</button>
+                        <button class="btn btn-delete" onclick="confirmDelete(this)">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updatePagination();
+        }
+
+        function sortTable(column) {
+            const table = document.getElementById('student-table');
+            const isAscending = table.dataset.sortColumn !== column.toString() || table.dataset.sortOrder !== 'asc';
+            students.sort((a, b) => {
+                let aValue = a[Object.keys(a)[column]] || '';
+                let bValue = b[Object.keys(b)[column]] || '';
+                if (column === 5) {
+                    aValue = aValue ? new Date(aValue) : new Date(0);
+                    bValue = bValue ? new Date(bValue) : new Date(0);
+                } else if (column === 6) {
+                    aValue = aValue ? parseInt(aValue) : 0;
+                    bValue = bValue ? parseInt(bValue) : 0;
+                }
+                if (aValue < bValue) return isAscending ? -1 : 1;
+                if (aValue > bValue) return isAscending ? 1 : -1;
+                return 0;
+            });
+            table.dataset.sortColumn = column;
+            table.dataset.sortOrder = isAscending ? 'asc' : 'desc';
+            updateTable();
+        }
+
+        function changePage(page) {
+            if (page === 'next') {
+                currentPage++;
+            } else if (page === 'prev') {
+                currentPage--;
+            } else {
+                currentPage = page;
+            }
+            const totalPages = Math.ceil(filteredStudents().length / rowsPerPage);
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            updateTable();
+            updatePagination();
+        }
+
+        function updatePagination() {
+            const pagination = document.querySelector('.pagination');
+            pagination.innerHTML = '';
+            const totalPages = Math.ceil(filteredStudents().length / rowsPerPage);
+
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                prevBtn.onclick = () => changePage('prev');
+                pagination.appendChild(prevBtn);
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.onclick = () => changePage(i);
+                if (i === currentPage) btn.classList.add('active');
+                pagination.appendChild(btn);
+            }
+
+            if (currentPage < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                nextBtn.onclick = () => changePage('next');
+                pagination.appendChild(nextBtn);
+            }
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function updateTotalStudents() {
+            document.getElementById('total-students').textContent = students.length;
+        }
+
+        function showProgramStats() {
+            const statsBody = document.getElementById('program-stats-body');
+            statsBody.innerHTML = '';
+            const programs = [
+                'BSIT', 'BEED', 'BSHM', 'BPED', 'BSBA-MM', 'BS-CRIM',
+                'BSED-FILIPINO', 'BSED-ENGLISH', 'JHS', 'STEM', 'ABM', 'ELEMENTARY'
+            ];
+            programs.forEach(program => {
+                const count = students.filter(s => s.degree_program === program).length;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${program}</td>
+                    <td>${count}</td>
+                `;
+                statsBody.appendChild(row);
+            });
+            const programStats = document.getElementById('program-stats');
+            programStats.style.display = programStats.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('calendar-container').style.display = 'none';
+        }
+
+        function showCalendar() {
+            const calendarContainer = document.getElementById('calendar');
+            calendarContainer.innerHTML = '';
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            months.forEach((month, index) => {
+                const monthTable = document.createElement('table');
+                monthTable.className = 'calendar';
+                monthTable.innerHTML = `
+                    <thead>
+                        <tr><th colspan="7">${month} 2025</th></tr>
+                        <tr>
+                            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+                const tbody = monthTable.querySelector('tbody');
+                const firstDay = new Date(2025, index, 1).getDay();
+                const daysInMonth = new Date(2025, index + 1, 0).getDate();
+                let date = 1;
+                for (let i = 0; i < 6; i++) {
+                    const row = document.createElement('tr');
+                    for (let j = 0; j < 7; j++) {
+                        const cell = document.createElement('td');
+                        if (i === 0 && j < firstDay) {
+                            cell.className = 'empty';
+                        } else if (date > daysInMonth) {
+                            cell.className = 'empty';
+                        } else {
+                            cell.textContent = date;
+                            date++;
+                        }
+                        row.appendChild(cell);
+                    }
+                    tbody.appendChild(row);
+                }
+                calendarContainer.appendChild(monthTable);
+            });
+            const calendarDiv = document.getElementById('calendar-container');
+            calendarDiv.style.display = calendarDiv.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('program-stats').style.display = 'none';
+        }
+
+        function logout() {
+            showNotification('Logged out successfully!');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        function addRecentActivity(action, student, program) {
+            const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            recentActivities.unshift({ action, student, program, date });
+            if (recentActivities.length > 5) recentActivities.pop();
+            updateRecentActivities();
+        }
+
+        function updateRecentActivities() {
+            const tbody = document.getElementById('recent-activities');
+            tbody.innerHTML = '';
+            recentActivities.forEach(activity => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${activity.action}</td>
+                    <td>${activity.student}</td>
+                    <td>${activity.program || '-'}</td>
+                    <td>${activity.date}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStudents();
+            showContent('registrar');
+        });
+    </script>
+</body>
+</html>

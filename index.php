@@ -90,15 +90,5 @@
         <input type="submit" value="Upload File">
     </form>
 
-    <h3>Uploaded Files</h3>
-    <ul>
-        <?php
-        $files = array_diff(scandir('uploads'), array('.', '..'));
-        foreach ($files as $file) {
-            echo "<li>$file <a href='download.php?file=" . urlencode($file) . "'>Download</a></li>";
-        }
-        ?>
-    </ul>
-
 </body>
 </html>
